@@ -75,6 +75,9 @@ A model object of class \code{brlr}, with components
 	\item{FisherInfo}{the estimated Fisher information matrix}
 	\item{contrasts}{as for \code{\link{glm}}}
 	\item{xlevels}{as for \code{\link{glm}}}
+	\item{residuals}{as for \code{\link{glm}}}
+	\item{data}{as for \code{\link{glm}}}
+	\item{boundary}{as for \code{\link{glm}}; but always \code{FALSE}}
 }
 \references{
 

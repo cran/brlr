@@ -37,4 +37,3 @@ glm(cbind(grahami, opalinus) ~ height + diameter + light + time,
     family = binomial, data=lizards)
 }
 \keyword{datasets}
-

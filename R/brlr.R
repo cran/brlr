@@ -139,6 +139,11 @@ brlr <-
         fit$na.action <- attr(m, "na.action")
     fit$contrasts <- attr(x, "contrasts")
     fit$xlevels <- xlev
+    if (missing(data)) 
+        data <- environment(formula)
+    fit$data <- data
+    fit$boundary <- FALSE
+    fit$residuals <- (y - pr*denom)/(denom*pr*(1-pr))
     fit
 }
 
