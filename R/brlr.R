@@ -107,19 +107,22 @@ function (formula, data = NULL, offset, weights, start, ..., subset,
         y = y/denom,
         family = binomial(),
         offset=offset,
-        prior.weights=wt*denom,
-        terms=Terms,
+        prior.weights = wt*denom,
+        weights = wt*denom*pr*(1-pr),
+        terms = Terms,
         dispersion = dispersion,
-        bias.reduction=br,
+        bias.reduction = br,
         leverages=h)
-    W <- denom*pr*(1-pr)
+    class(fit) <- c("brlr","glm","lm")
+    W <- fit$weights
+    fit$qr <- qr(model.matrix(fit)*sqrt(W))
+    fit$rank <- fit$qr$rank
     fit$FisherInfo <- t(x) %*% sweep(x,1,W,"*")
     attr(fit, "na.message") <- attr(m, "na.message")
     if (!is.null(attr(m, "na.action"))) 
         fit$na.action <- attr(m, "na.action")
     fit$contrasts <- attr(x, "contrasts")
     fit$xlevels <- xlev
-    class(fit) <- c("brlr","glm","lm")
     fit
 }
 

@@ -63,13 +63,18 @@ A model object of class \code{brlr}, with components
         \item{family}{a \code{family} object, binomial with logistic link, 
                           as for \code{\link{glm}}}
         \item{offset}{as for \code{\link{glm}}}
-        \item{prior weights}{as for \code{\link{glm}}}
+        \item{prior.weights}{as for \code{\link{glm}}}
         \item{terms}{as for \code{\link{glm}}}
         \item{dispersion}{as for \code{\link{glm}}; the
 	  \code{dispersion} argument if supplied, otherwise 1}
-        \item{bias.reduction}{logical, TRUE if \code{br=TRUE} was given
-	  (the default)}
-        \item{leverages}{the diagonal elements of the model's ``hat'' matrix}
+        \item{bias.reduction}{logical, the value of argument \code{br}}
+        \item{leverages}{the diagonal elements of the model's ``hat''
+	  matrix}
+	\item{qr}{as for \code{\link{glm}}}
+	\item{rank}{as for \code{\link{glm}}}
+	\item{FisherInfo}{the estimated Fisher information matrix}
+	\item{contrasts}{as for \code{\link{glm}}}
+	\item{xlevels}{as for \code{\link{glm}}}
 }
 \references{
 
