@@ -93,7 +93,7 @@ separation in logistic regression.  \emph{Statistics in Medicine} \bold{21},
 2409--2419.
 }
 
-\author{David Firth, \email{david.firth@nuffield.ox.ac.uk}}
+\author{David Firth, \email{d.firth@warwick.ac.uk}}
 \note{
 1.  Methods specific to the \code{brlr} class of models are 
 \itemize{
