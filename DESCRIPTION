@@ -1,5 +1,5 @@
 Package: brlr
-Version: 0.8
+Version: 0.8-1
 Title: Bias-reduced logistic regression
 Author: David Firth
 Maintainer: David Firth <d.firth@warwick.ac.uk>

@@ -66,7 +66,7 @@ brlr <-
     if (length(offset) <= 1) 
         offset. <- rep(0, n)
     y <- model.extract(m, response)
-    denom <- rep(1, n)
+    denom.adj <- denom <- rep(1, n)
     if (is.factor(y) && nlevels(y) == 2) 
         y <- as.numeric(y) - 1
     if (is.matrix(y) && ncol(y) == 2 && is.numeric(y)) {
