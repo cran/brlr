@@ -5,6 +5,8 @@
 \alias{print.summary.brlr}
 \alias{vcov.brlr}
 \alias{predict.brlr}
+\alias{add1.brlr}
+\alias{drop1.brlr}
 \title{Bias-reduced Logistic Regression}
 \description{
 Fits a logistic regression by maximum penalized likelihood, in 
@@ -15,11 +17,13 @@ and standard errors (whereas the MLE is infinite in situations
 of complete or quasi-complete separation).
 }
 \usage{
-brlr(formula, data=NULL, offset, weights, start, ..., subset,
-   dispersion=1, na.action=na.fail, contrasts=NULL, br=TRUE)
+brlr(formula, data = NULL, offset, weights, start, ..., subset,
+   dispersion = 1, na.action = na.fail, contrasts = NULL,
+   x = FALSE, br = TRUE, control = list(maxit = 200))
 }
 \arguments{
-  \item{formula}{ a model formula as for \code{\link{glm}} }
+  \item{formula}{ a model formula as for \code{\link{glm}}, or an
+  object of class \code{glm} }
   \item{data}{ an data frame as for \code{\link{glm}} }
   \item{offset}{ an optional vector as for \code{\link{glm}} }
   \item{weights}{ an optional vector as for \code{\link{glm}} }
@@ -36,8 +40,10 @@ brlr(formula, data=NULL, offset, weights, start, ..., subset,
           ``factory-fresh'' default is \code{na.omit}. }
   \item{contrasts}{ an optional list. See the \code{contrasts.arg} of
           \code{\link{model.matrix.default}}.}
+  \item{x}{should the model matrix be included in the resultant object?}
   \item{br}{a logical switch indicating whether the bias-reducing 
-           penalty is applied; default is \code{TRUE}}
+    penalty is applied; default is \code{TRUE}}
+  \item{control}{as for \code{link{optim}}}
 }
 \details{
   \code{brlr} has essentially the same user interface as
@@ -78,6 +84,9 @@ A model object of class \code{brlr}, with components
 	\item{residuals}{as for \code{\link{glm}}}
 	\item{data}{as for \code{\link{glm}}}
 	\item{boundary}{as for \code{\link{glm}}; but always \code{FALSE}}
+	\item{x}{if \code{x = TRUE} is specified}
+	\item{control}{the \code{control} list as used in the call to
+	  \code{\link{optim}}}
 }
 \references{
 
@@ -102,6 +111,8 @@ separation in logistic regression.  \emph{Statistics in Medicine} \bold{21},
   \item \code{print.summary.brlr}
   \item \code{vcov.brlr}
   \item \code{predict.brlr}
+  \item \code{add1.brlr}
+  \item \code{drop1.brlr}
 }
 
 Others are inherited from the \code{\link{glm}} class.
@@ -118,7 +129,7 @@ Schemper (2002).
 
 \examples{
 ## Habitat preferences of lizards, from McCullagh and Nelder (1989, p129);
-## this reproduces the results from Firth (1992).
+## this reproduces the results given in Firth (1992).
 ##
 ## First the standard maximum-likelihood fit:
 data(lizards)
