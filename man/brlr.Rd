@@ -86,8 +86,8 @@ Firth, D. (1992)  Bias reduction, the Jeffreys prior and GLIM. In
 B J Francis, R Gilchrist and G Tutz, pp91--100.  New York: Springer.
 
 Heinze, G. and Schemper, M. (2002)  A solution to the problem of
-separation in logistic regression.  \emph{Statistics in Medicine},
-to appear.  See \url{http://www.akh-wien.ac.at/imc/biometrie/fl/haupt.html}.
+separation in logistic regression.  \emph{Statistics in Medicine} \bold{21},
+2409--2419.
 }
 
 \author{David Firth, \email{david.firth@nuffield.ox.ac.uk}}
