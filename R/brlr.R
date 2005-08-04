@@ -1,25 +1,26 @@
 brlr <-
     function (formula, data = NULL, offset, weights, start, ...,
-              subset, dispersion = 1, na.action = na.fail,
+              subset, dispersion = 1, na.action = na.omit,
               contrasts = NULL, x = FALSE, br = TRUE,
               control = list(maxit = 200)) 
 {
     glimlog <- function(y) {  
     # log function as in GLIM
-        ifelse(y == 0, 0, log(y))
+    # to cope with zero counts and zero denominators
+        ifelse(y == 0 | is.na(y), 0, log(y))
     }
     fmin <- function(beta) {
         eta <- offset. + drop(x %*% beta)
         pr <- plogis(eta)
         w <- wt * denom * pr * (1 - pr)
         detinfo <- det(t(x) %*% sweep(x, 1, w, "*"))
-        if (all(pr > 0) && all(pr < 1) && detinfo > 0) 
+        if (all(pr > 0) && all(pr < 1) && detinfo > 0) {
             sum(wt * (y * glimlog(y/(denom * pr)) +
                      (denom - y) *
                         glimlog((denom - y)/(denom * (1 - pr))))
                 ) - 
                 br * 0.5 * log(detinfo)
-        else Inf
+        } else Inf
     }
     gmin <- function(beta) {
         eta <- offset. + drop(x %*% beta)
@@ -39,6 +40,7 @@ brlr <-
     if (is.matrix(eval(m$data, parent.frame()))) 
         m$data <- as.data.frame(data)
     m$start <- m$br <- m$control <- m$... <- NULL
+    m$na.action <- na.action
     m[[1]] <- as.name("model.frame")
     m <- eval(m, parent.frame())
     Terms <- attr(m, "terms")
@@ -63,12 +65,11 @@ brlr <-
     if (!length(wt)) 
         wt <- rep(1, n)
     offset <- model.extract(m, offset)
-    if (length(offset) <= 1) 
-        offset. <- rep(0, n)
+    offset. <- if (is.null(offset)) rep(0, n) else offset 
+    if (length(offset.) != n) stop("offset has wrong length")
     y <- model.extract(m, response)
     denom.adj <- denom <- rep(1, n)
-    if (is.factor(y) && nlevels(y) == 2) 
-        y <- as.numeric(y) - 1
+    if (is.factor(y) && nlevels(y) == 2) y <- as.numeric(y) - 1
     if (is.matrix(y) && ncol(y) == 2 && is.numeric(y)) {
         denom <- as.vector(apply(y, 1, sum))
         denom.adj <- denom + (denom < 0.01)
@@ -94,7 +95,7 @@ brlr <-
     xstored <- x
     xmax.stored <- xmax
     if (any(redundant)){
-        x <- x[, -which(redundant)]
+        x <- x[, -which(redundant), drop = FALSE]
         xmax <- xmax[-which(redundant)]
         start <- start[-which(redundant)]}
     fstart <- fmin(start)

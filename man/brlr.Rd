@@ -18,7 +18,7 @@ of complete or quasi-complete separation).
 }
 \usage{
 brlr(formula, data = NULL, offset, weights, start, ..., subset,
-   dispersion = 1, na.action = na.fail, contrasts = NULL,
+   dispersion = 1, na.action = na.omit, contrasts = NULL,
    x = FALSE, br = TRUE, control = list(maxit = 200))
 }
 \arguments{

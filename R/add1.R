@@ -13,10 +13,12 @@
         P[nnas] <- pf(Fs[nnas], df[nnas], rdf - df[nnas], lower.tail = FALSE)
         list(Fs = Fs, P = P)
     }
-    if (!is.character(scope)) 
+    if (!is.character(scope)) { 
         scope <- add.scope(object, update.formula(object, scope))
-    if (!length(scope)) 
+    }
+    if (!length(scope)) {
         stop("no terms in scope for adding to object")
+    }
     oTerms <- attr(object$terms, "term.labels")
     int <- attr(object$terms, "intercept")
     ns <- length(scope)
@@ -29,35 +31,40 @@
     new.form <- update.formula(object, add.rhs)
     Terms <- terms(new.form)
     y <- object$y
-    wt <- object$prior.weights
+    fc <- object$call
+    fc$formula <- Terms
+    fob <- list(call = fc)
+    class(fob) <- oldClass(object)
+    m <- model.frame(fob, xlev = object$xlevels)
+    wt <- model.weights(m)
+    os <- model.offset(m)
+    oldn <- length(y)
+    y <- model.response(m, "numeric")
+    if (NCOL(y) == 2) y <- y[, 1]/(y[, 1] + y[, 2])
+    newn <- length(y)
+    if (newn < oldn) {
+        warning(paste("using the", newn, "/", oldn,
+                      "rows from a combined fit"))
+    }
     if (is.null(x)) {
-        fc <- object$call
-        fc$formula <- Terms
-        fob <- list(call = fc)
-        class(fob) <- oldClass(object)
-        m <- model.frame(fob, xlev = object$xlevels)
         x <- model.matrix(Terms, m, contrasts = object$contrasts)
-        oldn <- length(y)
-        y <- model.response(m, "numeric")
-        if (NCOL(y) == 2) 
-            y <- y[, 1]/(y[, 1] + y[, 2])
-        newn <- length(y)
-        if (newn < oldn) 
-            warning(paste("using the", newn, "/", oldn, "rows from a combined fit"))
     }
     n <- nrow(x)
-    if (is.null(wt)) 
-        wt <- rep.int(1, n)
+    if (is.null(wt)) wt <- rep.int(1, n)
     y <- cbind(y*wt, (1-y)*wt)
     Terms <- attr(Terms, "term.labels")
     asgn <- attr(x, "assign")
     ousex <- match(asgn, match(oTerms, Terms), 0) > 0
-    if (int) 
-        ousex[1] <- TRUE
+    if (int) ousex[1] <- TRUE
+    X <- x[, ousex, drop = FALSE]
+    z <- brlr(y ~ X, offset = os, br = object$bias.reduction,
+                     control = object$control)
+    dfs[1] <- z$rank
+    dev[1] <- z$deviance
     for (tt in scope) {
         usex <- match(asgn, match(tt, Terms), 0) > 0
         X <- x[, usex | ousex, drop = FALSE]
-        z <- brlr(y ~ X,  offset = object$offset, br = object$bias.reduction,
+        z <- brlr(y ~ X,  offset = os, br = object$bias.reduction,
                      control = object$control)
         dfs[tt] <- z$rank
         dev[tt] <- z$deviance
