@@ -39,7 +39,7 @@ brlr <-
     m <- match.call(expand.dots = FALSE)
     if (is.matrix(eval(m$data, parent.frame()))) 
         m$data <- as.data.frame(data)
-    m$start <- m$br <- m$control <- m$... <- NULL
+    m$start <- m$br <- m$control <- m$contrasts <- m$... <- NULL
     m$na.action <- na.action
     m[[1]] <- as.name("model.frame")
     m <- eval(m, parent.frame())
