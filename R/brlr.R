@@ -2,9 +2,9 @@ brlr <-
     function (formula, data = NULL, offset, weights, start, ...,
               subset, dispersion = 1, na.action = na.omit,
               contrasts = NULL, x = FALSE, br = TRUE,
-              control = list(maxit = 200)) 
+              control = list(maxit = 200))
 {
-    glimlog <- function(y) {  
+    glimlog <- function(y) {
     # log function as in GLIM
     # to cope with zero counts and zero denominators
         ifelse(y == 0 | is.na(y), 0, log(y))
@@ -18,16 +18,16 @@ brlr <-
             sum(wt * (y * glimlog(y/(denom * pr)) +
                      (denom - y) *
                         glimlog((denom - y)/(denom * (1 - pr))))
-                ) - 
+                ) -
                 br * 0.5 * log(detinfo)
         } else Inf
     }
     gmin <- function(beta) {
         eta <- offset. + drop(x %*% beta)
         pr <- plogis(eta)
-        h <- hat(sweep(x, 1, sqrt(wt * denom * pr * (1 - pr)), 
+        h <- hat(sweep(x, 1, sqrt(wt * denom * pr * (1 - pr)),
                        "*"), intercept = FALSE)
-        -drop((wt * (y + br * h/2 - pr * (denom + br * h))) %*% 
+        -drop((wt * (y + br * h/2 - pr * (denom + br * h))) %*%
               x)
     }
     if (inherits(formula, "glm")){
@@ -37,7 +37,7 @@ brlr <-
         call[[1]] <- as.name("brlr")
         return(eval(call, parent.frame()))}
     m <- match.call(expand.dots = FALSE)
-    if (is.matrix(eval(m$data, parent.frame()))) 
+    if (is.matrix(eval(m$data, parent.frame())))
         m$data <- as.data.frame(data)
     m$start <- m$br <- m$control <- m$contrasts <- m$... <- NULL
     m$na.action <- na.action
@@ -49,12 +49,12 @@ brlr <-
     if (ncol(x) == 0) {  ## no estimation to do
         thecall <- match.call(expand.dots = TRUE)
         thecall[[1]] <- as.name("glm")
-        return(eval(thecall, parent.frame()))} 
+        return(eval(thecall, parent.frame()))}
     xmax <- apply(abs(x), 2, max)
     x.unscaled <- x
     x <- sweep(x, 2, xmax, "/")
     xvars <- as.character(attr(Terms, "variables"))[-1]
-    if ((yvar <- attr(Terms, "response")) > 0) 
+    if ((yvar <- attr(Terms, "response")) > 0)
         xvars <- xvars[-yvar]
     xlev <- if (length(xvars) > 0) {
         xlev <- lapply(m[xvars], levels)
@@ -62,10 +62,10 @@ brlr <-
     }
     wt <- model.extract(m, weights)
     n <- nrow(x)
-    if (!length(wt)) 
+    if (!length(wt))
         wt <- rep(1, n)
     offset <- model.extract(m, offset)
-    offset. <- if (is.null(offset)) rep(0, n) else offset 
+    offset. <- if (is.null(offset)) rep(0, n) else offset
     if (length(offset.) != n) stop("offset has wrong length")
     y <- model.extract(m, response)
     denom.adj <- denom <- rep(1, n)
@@ -77,7 +77,7 @@ brlr <-
     }
     ow <- options("warn")[[1]]
     options(warn = -1)
-    fit <- glm.fit(x, y/denom.adj, wt * denom, family = binomial(), 
+    fit <- glm.fit(x, y/denom.adj, wt * denom, family = binomial(),
                    offset = offset.,
                    control = glm.control(maxit = 1))
     pr <- fit$fitted
@@ -123,32 +123,32 @@ brlr <-
     eta <- as.vector(x %*% beta)
     lp <- offset. + eta
     pr <- plogis(lp)
-    convergence <- if (res$convergence == 0) 
+    convergence <- if (res$convergence == 0)
         TRUE
     else res$convergence
-    h <- hat(sweep(x, 1, sqrt(wt * denom * pr * (1 - pr)), "*"), 
+    h <- hat(sweep(x, 1, sqrt(wt * denom * pr * (1 - pr)), "*"),
              intercept = FALSE)
     coefs <- est.start
     coefs[!is.na(coefs)] <- beta
     fit <- list(coefficients = coefs,
                 deviance = deviance,
-                penalized.deviance = penalized.deviance, 
+                penalized.deviance = penalized.deviance,
                 fitted.values = pr,
                 linear.predictors = lp,
-                call = match.call(), 
+                call = match.call(),
                 formula = formula,
-                convergence = convergence, 
+                convergence = convergence,
                 niter = niter,
                 df.residual = resdf,
-                df.null = nulldf, 
+                df.null = nulldf,
                 model = m,
                 y = y/denom,
                 family = binomial(),
-                offset = offset, 
+                offset = offset,
                 prior.weights = wt * denom,
                 weights = wt * denom * pr * (1 - pr),
                 terms = Terms,
-                dispersion = dispersion, 
+                dispersion = dispersion,
                 bias.reduction = br,
                 leverages = h,
                 control = control)
@@ -158,11 +158,11 @@ brlr <-
     fit$rank <- fit$qr$rank
     fit$FisherInfo <- t(x) %*% sweep(x, 1, W, "*")
     attr(fit, "na.message") <- attr(m, "na.message")
-    if (!is.null(attr(m, "na.action"))) 
+    if (!is.null(attr(m, "na.action")))
         fit$na.action <- attr(m, "na.action")
     fit$contrasts <- attr(x.unscaled, "contrasts")
     fit$xlevels <- xlev
-    if (missing(data)) 
+    if (missing(data))
         data <- environment(formula)
     fit$data <- data
     fit$boundary <- FALSE
@@ -171,7 +171,7 @@ brlr <-
     fit
 }
 
-vcov.brlr <- function (object, ...) 
+vcov.brlr <- function (object, ...)
 {
     structure(
         object$dispersion * chol2inv(chol(object$FisherInfo)),
@@ -180,8 +180,8 @@ vcov.brlr <- function (object, ...)
 
 print.brlr <-
     function (x, digits = max(3, getOption("digits") - 3),
-              na.print = "", 
-              ...) 
+              na.print = "",
+              ...)
 {
     if (!is.null(cl <- x$call)) {
         cat("Call:  ")
@@ -195,7 +195,7 @@ print.brlr <-
         cat("\nNo coefficients\n")
     }
     cat("\nDeviance:",
-        format(round(x$deviance, digits), nsmall = 2), 
+        format(round(x$deviance, digits), nsmall = 2),
         "\n")
     if (x$bias.reduction) {
         cat("Penalized deviance:",
@@ -207,7 +207,7 @@ print.brlr <-
 
 summary.brlr <-
 function (object, dispersion = NULL,
-          digits = max(3, .Options$digits - 3), ...) 
+          digits = max(3, .Options$digits - 3), ...)
 {
     cc <- coef(object)
     object$pc <- pc <- length(coef(object))
@@ -215,7 +215,7 @@ function (object, dispersion = NULL,
                      c("Value", "Std. Error", "t value")))
     coef[, 1] <- cc
     vc <- vcov.brlr(object)
-    if (is.null(dispersion)) 
+    if (is.null(dispersion))
         dispersion <- object$dispersion
     else vc <- vc * dispersion/(object$dispersion)
     sd <- cc
@@ -229,7 +229,7 @@ function (object, dispersion = NULL,
 }
 
 print.summary.brlr <-
-    function (x, digits = x$digits, ...) 
+    function (x, digits = x$digits, ...)
 {
     if (!is.null(cl <- x$call)) {
         cat("Call:\n")
@@ -245,7 +245,7 @@ print.summary.brlr <-
         cat("\nNo coefficients\n")
     }
     cat("\nDeviance:",
-        format(round(x$deviance, digits), nsmall = 2), 
+        format(round(x$deviance, digits), nsmall = 2),
         "\n")
     if (x$bias.reduction) {
         cat("Penalized deviance:",
@@ -255,33 +255,38 @@ print.summary.brlr <-
     invisible(x)
 }
 
-predict.brlr <-
-    function (object, newdata = NULL, type = c("link", "response"), 
-              dispersion = NULL, terms = NULL, ...) 
+if (FALSE) {predict.brlr <-
+  ##  No longer needed -- can use predict.glm instead
+    function (object, newdata = NULL, type = c("link", "response"),
+              dispersion = NULL, terms = NULL, ...)
 {
     type <- match.arg(type)
     na.act <- object$na.action
     object$na.action <- NULL
     if (missing(newdata)) {
-        pred <- switch(type, link = object$linear.predictors, 
+        pred <- switch(type, link = object$linear.predictors,
                        response = object$fitted)
-        if (!is.null(na.act)) 
+        if (!is.null(na.act))
             pred <- napredict(na.act, pred)
     }
     else {
         newdata <- as.data.frame(newdata)
         Terms <- delete.response(object$terms)
-        m <- model.frame(Terms, newdata, na.action = function(x) x, 
+        m <- model.frame(Terms, newdata, na.action = function(x) x,
                          xlev = object$xlevels)
         X <- model.matrix(Terms, m, contrasts = object$contrasts)
-        offset <- if (!is.null(off.num <- attr(Terms, "offset"))) 
-            eval(attr(Terms, "variables")[[off.num + 1]], newdata)
-        else if (!is.null(object$offset)) 
-            eval(object$call$offset, newdata)
-        pred <- offset + drop(X %*% object$coef)
+        offset. <- {
+            if (!is.null(off.num <- attr(Terms, "offset")))
+                eval(attr(Terms, "variables")[[off.num + 1]], newdata)
+            else if (!is.null(object$offset))
+                eval(object$call$offset, newdata)
+        }
+        if (is.null(offset.)) offset. <- 0
+        pred <- offset. + drop(X %*% object$coef)
         switch(type, response = {
             pred <- plogis(pred)
         }, link = )
     }
     pred
+}
 }

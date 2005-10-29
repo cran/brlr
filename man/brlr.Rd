@@ -4,7 +4,7 @@
 \alias{summary.brlr}
 \alias{print.summary.brlr}
 \alias{vcov.brlr}
-\alias{predict.brlr}
+% \alias{predict.brlr}
 \alias{add1.brlr}
 \alias{drop1.brlr}
 \title{Bias-reduced Logistic Regression}
@@ -110,7 +110,7 @@ separation in logistic regression.  \emph{Statistics in Medicine} \bold{21},
   \item \code{summary.brlr}
   \item \code{print.summary.brlr}
   \item \code{vcov.brlr}
-  \item \code{predict.brlr}
+%  \item \code{predict.brlr}
   \item \code{add1.brlr}
   \item \code{drop1.brlr}
 }
