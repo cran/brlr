@@ -43,7 +43,7 @@ brlr(formula, data = NULL, offset, weights, start, ..., subset,
   \item{x}{should the model matrix be included in the resultant object?}
   \item{br}{a logical switch indicating whether the bias-reducing 
     penalty is applied; default is \code{TRUE}}
-  \item{control}{as for \code{link{optim}}}
+  \item{control}{as for \code{\link{optim}}}
 }
 \details{
   \code{brlr} has essentially the same user interface as
@@ -100,7 +100,9 @@ B J Francis, R Gilchrist and G Tutz, pp91--100.  New York: Springer.
 Heinze, G. and Schemper, M. (2002)  A solution to the problem of
 separation in logistic regression.  \emph{Statistics in Medicine} \bold{21},
 2409--2419.
-}
+
+Zorn, C (2005).  A solution to separation in binary response models.
+\emph{Political Analysis} \bold{13}, 157--170.}
 
 \author{David Firth, \email{d.firth@warwick.ac.uk}}
 \note{
@@ -124,7 +126,7 @@ regression, bias reduction is achieved by a slight shrinkage
 of coefficients towards zero; thus bias reduction also reduces
 variance.)  The difference is typically small except in situations
 of sparse data and/or complete separation.  See also Heinze and
-Schemper (2002).
+Schemper (2002), Zorn (2005).
 }
 
 \examples{

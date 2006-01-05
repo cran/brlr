@@ -4,30 +4,23 @@ brlr <-
               contrasts = NULL, x = FALSE, br = TRUE,
               control = list(maxit = 200))
 {
-    glimlog <- function(y) {
-    # log function as in GLIM
-    # to cope with zero counts and zero denominators
-        ifelse(y == 0 | is.na(y), 0, log(y))
-    }
+    Det <- function(mat) prod(eigen(mat)$values, symmetric = TRUE, only.values = TRUE)
     fmin <- function(beta) {
         eta <- offset. + drop(x %*% beta)
         pr <- plogis(eta)
         w <- wt * denom * pr * (1 - pr)
-        detinfo <- det(t(x) %*% sweep(x, 1, w, "*"))
-        if (all(pr > 0) && all(pr < 1) && detinfo > 0) {
-            sum(wt * (y * glimlog(y/(denom * pr)) +
-                     (denom - y) *
-                        glimlog((denom - y)/(denom * (1 - pr))))
-                ) -
-                br * 0.5 * log(detinfo)
-        } else Inf
+        half.deviance <- sum(0.5 * binomial()$dev.resids(y/denom, pr, denom * wt))
+        if (br) {
+            detinfo <- Det(crossprod(x, w * x))
+            half.deviance - 0.5 * log(if(detinfo > 0) detinfo else .Machine$double.eps)
+        }
+        else half.deviance
     }
     gmin <- function(beta) {
         eta <- offset. + drop(x %*% beta)
         pr <- plogis(eta)
-        h <- hat(sweep(x, 1, sqrt(wt * denom * pr * (1 - pr)),
-                       "*"), intercept = FALSE)
-        -drop((wt * (y + br * h/2 - pr * (denom + br * h))) %*%
+        h <- hat(x * sqrt(wt * denom * pr * (1 - pr)), intercept = FALSE)
+        - drop((wt * (y + br * h/2 - pr * (denom + br * h))) %*%
               x)
     }
     if (inherits(formula, "glm")){
@@ -68,25 +61,26 @@ brlr <-
     offset. <- if (is.null(offset)) rep(0, n) else offset
     if (length(offset.) != n) stop("offset has wrong length")
     y <- model.extract(m, response)
+    y.adj <- y + 0.1
     denom.adj <- denom <- rep(1, n)
     if (is.factor(y) && nlevels(y) == 2) y <- as.numeric(y) - 1
     if (is.matrix(y) && ncol(y) == 2 && is.numeric(y)) {
         denom <- as.vector(apply(y, 1, sum))
-        denom.adj <- denom + (denom < 0.01)
+        denom.adj <- denom + (denom < 0.01) + 0.2
         y <- as.vector(y[, 1])
     }
-    ow <- options("warn")[[1]]
+    op <- options()
     options(warn = -1)
-    fit <- glm.fit(x, y/denom.adj, wt * denom, family = binomial(),
+    fit <- glm.fit(x, y.adj/denom.adj, wt * denom, family = binomial(),
                    offset = offset.,
-                   control = glm.control(maxit = 1))
+                   control = glm.control(maxit = 5))
     pr <- fit$fitted
     eta <- qlogis(pr) - offset.
     w <- wt * denom * pr * (1 - pr)
     leverage <- hat(sweep(x, 1, sqrt(w), "*"), intercept = FALSE)
     z <- eta + (y + leverage/2 - (denom + leverage) * pr)/w
     fit <- lm.wfit(x, z, w)
-    options(warn = ow)
+    options(op)
     est.start <- fit$coefficients
     resdf <- fit$df.residual
     nulldf <- fit$df.null
@@ -126,6 +120,10 @@ brlr <-
     convergence <- if (res$convergence == 0)
         TRUE
     else res$convergence
+    if (any (abs(gmin(beta)) > 0.01)) {
+        warning("Not converged: gradient values not all zero")
+        convergence <- FALSE
+    }
     h <- hat(sweep(x, 1, sqrt(wt * denom * pr * (1 - pr)), "*"),
              intercept = FALSE)
     coefs <- est.start
@@ -156,7 +154,7 @@ brlr <-
     W <- fit$weights
     fit$qr <- qr(model.matrix(fit) * sqrt(W))
     fit$rank <- fit$qr$rank
-    fit$FisherInfo <- t(x) %*% sweep(x, 1, W, "*")
+    fit$FisherInfo <- crossprod(x, W * x)
     attr(fit, "na.message") <- attr(m, "na.message")
     if (!is.null(attr(m, "na.action")))
         fit$na.action <- attr(m, "na.action")
