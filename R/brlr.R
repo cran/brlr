@@ -4,15 +4,20 @@ brlr <-
               contrasts = NULL, x = FALSE, br = TRUE,
               control = list(maxit = 200))
 {
-    Det <- function(mat) prod(eigen(mat)$values, symmetric = TRUE, only.values = TRUE)
+    Det <- function(mat) prod(eigen(mat)$values,
+                              symmetric = TRUE,
+                              only.values = TRUE)
     fmin <- function(beta) {
         eta <- offset. + drop(x %*% beta)
         pr <- plogis(eta)
         w <- wt * denom * pr * (1 - pr)
-        half.deviance <- sum(0.5 * binomial()$dev.resids(y/denom, pr, denom * wt))
+        half.deviance <- sum(0.5 * binomial()$dev.resids(ifelse(denom > 0,
+                                                                y/denom, 0),
+                                                         pr, denom * wt))
         if (br) {
             detinfo <- Det(crossprod(x, w * x))
-            half.deviance - 0.5 * log(if(detinfo > 0) detinfo else .Machine$double.eps)
+            half.deviance - 0.5 * log(if(detinfo > 0) detinfo
+                                      else .Machine$double.eps)
         }
         else half.deviance
     }
@@ -61,9 +66,10 @@ brlr <-
     offset. <- if (is.null(offset)) rep(0, n) else offset
     if (length(offset.) != n) stop("offset has wrong length")
     y <- model.extract(m, response)
-    y.adj <- y + 0.1
-    denom.adj <- denom <- rep(1, n)
     if (is.factor(y) && nlevels(y) == 2) y <- as.numeric(y) - 1
+    y.adj <- y + 0.1
+    denom <- rep(1, n)
+    denom.adj <- denom + 0.2
     if (is.matrix(y) && ncol(y) == 2 && is.numeric(y)) {
         denom <- as.vector(apply(y, 1, sum))
         denom.adj <- denom + (denom < 0.01) + 0.2
