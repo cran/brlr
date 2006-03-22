@@ -25,8 +25,7 @@ brlr <-
         eta <- offset. + drop(x %*% beta)
         pr <- plogis(eta)
         h <- hat(x * sqrt(wt * denom * pr * (1 - pr)), intercept = FALSE)
-        - drop((wt * (y + br * h/2 - pr * (denom + br * h))) %*%
-              x)
+        - drop((wt * y + br * h/2 - pr * (wt * denom + br * h)) %*% x)
     }
     if (inherits(formula, "glm")){
         call <- formula$call
