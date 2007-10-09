@@ -57,14 +57,14 @@ brlr <-
         xlev <- lapply(m[xvars], levels)
         xlev[!sapply(xlev, is.null)]
     }
-    wt <- model.extract(m, weights)
+    wt <- model.extract(m, "weights")
     n <- nrow(x)
     if (!length(wt))
         wt <- rep(1, n)
-    offset <- model.extract(m, offset)
+    offset <- model.extract(m, "offset")
     offset. <- if (is.null(offset)) rep(0, n) else offset
     if (length(offset.) != n) stop("offset has wrong length")
-    y <- model.extract(m, response)
+    y <- model.extract(m, "response")
     if (is.factor(y) && nlevels(y) == 2) y <- as.numeric(y) - 1
     y.adj <- y + 0.1
     denom <- rep(1, n)

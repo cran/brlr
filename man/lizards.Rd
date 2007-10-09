@@ -1,6 +1,6 @@
 \name{lizards}
+\docType{data}
 \alias{lizards}
-\non_function{}
 \title{Habitat Preferences of Lizards}
 \usage{data(lizards)}
 \description{
