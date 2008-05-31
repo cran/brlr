@@ -4,6 +4,8 @@ brlr <-
               contrasts = NULL, x = FALSE, br = TRUE,
               control = list(maxit = 200))
 {
+    warning("The brlr function is deprecated in favour of better facilities in the brglm package, contributed by Ioannis Kosmidis.  It is likely that brlr will be withdrawn from CRAN at some time in the future.")
+
     Det <- function(mat) prod(eigen(mat)$values,
                               symmetric = TRUE,
                               only.values = TRUE)

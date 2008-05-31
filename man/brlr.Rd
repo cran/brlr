@@ -14,7 +14,8 @@ which the penalty function is the Jeffreys invariant prior.  This
 removes the O(1/n) term from the asymptotic bias of estimated
 coefficients (Firth, 1993), and always yields finite estimates
 and standard errors (whereas the MLE is infinite in situations
-of complete or quasi-complete separation).
+of complete or quasi-complete separation).  Now deprecated, in
+favour of \code{\link[brglm]{brglm}}.
 }
 \usage{
 brlr(formula, data = NULL, offset, weights, start, ..., subset,
@@ -48,7 +49,13 @@ brlr(formula, data = NULL, offset, weights, start, ..., subset,
 \details{
   \code{brlr} has essentially the same user interface as
   \code{glm(family=binomial, ...)} ---
-see the example below.
+  see the example below.
+
+  As of version 0.9-0 (May 2008), the \code{brlr} function is
+  \bold{deprecated}: 
+  it is likely to be withdrawn at some time in the future.  This is because
+  it is superseded by more general and more efficient facilities in
+  \code{\link[brglm]{brglm}}, contributed to CRAN in 2008 by Ioannis Kosmidis.  
 }
 \value{
 A model object of class \code{brlr}, with components
@@ -104,6 +111,10 @@ separation in logistic regression.  \emph{Statistics in Medicine} \bold{21},
 Zorn, C (2005).  A solution to separation in binary response models.
 \emph{Political Analysis} \bold{13}, 157--170.}
 
+\seealso{
+            \code{\link[brglm]{brglm}}.
+          }
+	  
 \author{David Firth, \email{d.firth@warwick.ac.uk}}
 \note{
 1.  Methods specific to the \code{brlr} class of models are 
@@ -130,6 +141,7 @@ Schemper (2002), Zorn (2005).
 }
 
 \examples{
+\dontrun{
 ## Habitat preferences of lizards, from McCullagh and Nelder (1989, p129);
 ## this reproduces the results given in Firth (1992).
 ##
@@ -140,6 +152,7 @@ glm(cbind(grahami, opalinus) ~ height + diameter + light + time,
 ## Now the bias-reduced version:
 brlr(cbind(grahami, opalinus) ~ height + diameter + light + time,
     data=lizards)
+  }
 }
 \keyword{models}
 \keyword{regression}
